@@ -53,13 +53,12 @@ so on and so forth for each platform.
 ```gdscript
 
 # Create new keypair
-var kp = Nostr.generate_key() # This creates a dictionary with seckey and pubkey
+var kp = Nostr.create_new_keypair() # This creates a dictionary with seckey and pubkey
 print(kp["seckey"])
 print(kp["pubkey"])
 
 # Create keypair for seckey hex
-var kp = Nostr.key_from_seckey("...hexkeypair")
-	
+var kp = Nostr.keypair_from_seckey("...hexkeypair")
 print(kp["seckey"])
 print(kp["pubkey"])
 ```

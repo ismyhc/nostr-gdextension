@@ -15,7 +15,7 @@ extern "C" {
 
 using namespace godot;
 
-Dictionary Nostr::generate_key() {
+Dictionary Nostr::create_new_keypair() {
 	Dictionary retval;
 
 	secp256k1_xonly_pubkey pubkey;
@@ -54,7 +54,7 @@ Dictionary Nostr::generate_key() {
 	return retval;
 }
 
-Dictionary Nostr::key_from_seckey(const String& seckey_hex) {
+Dictionary Nostr::keypair_from_seckey(const String& seckey_hex) {
 	Dictionary retval;
 	retval["seckey"] = seckey_hex;
 
@@ -152,8 +152,8 @@ secp256k1_context* Nostr::get_randomized_context() {
 }
 
 void Nostr::_bind_methods() {
-	ClassDB::bind_static_method("Nostr", D_METHOD("generate_key"), &Nostr::generate_key);
-	ClassDB::bind_static_method("Nostr", D_METHOD("key_from_seckey", "seckey_hex"), &Nostr::key_from_seckey);
+	ClassDB::bind_static_method("Nostr", D_METHOD("create_new_keypair"), &Nostr::create_new_keypair);
+	ClassDB::bind_static_method("Nostr", D_METHOD("keypair_from_seckey", "seckey_hex"), &Nostr::keypair_from_seckey);
 	ClassDB::bind_static_method("Nostr", D_METHOD("sign", "msg", "seckey_hex"), &Nostr::sign);
 	// ClassDB::bind_method(D_METHOD("generate_key"), &Nostr::generate_key);
 	// ClassDB::bind_method(D_METHOD("key_from_seckey", "seckey_hex"), &Nostr::key_from_seckey);

@@ -19,7 +19,7 @@ protected:
 	static secp256k1_context* get_randomized_context();
 
 private:
-	static Dictionary generate_key();
-	static Dictionary key_from_seckey(const String& seckey_hex);
+	static Dictionary create_new_keypair();
+	static Dictionary keypair_from_seckey(const String& seckey_hex);
 	static String sign(const String& msg, const String& seckey_hex);
 };
