@@ -24,7 +24,7 @@ def find_sources(dirs, exts):
     return sources
 
 # Configuration
-libname = "plugin_name"
+libname = "nostr"
 projectdir = "test_project"
 
 # Set up the environment
@@ -55,7 +55,7 @@ opts.Add(EnumVariable(
 
 is_2d_profile_used = False
 is_3d_profile_used = False
-is_custom_profile_used = True
+is_custom_profile_used = False
 if is_2d_profile_used:
     env["build_profile"] = "2d_build_profile.json"
 elif is_3d_profile_used:
@@ -91,8 +91,65 @@ bundle_id_prefix = env.get('bundle_id_prefix', 'com.gdextension')  # Ensure pref
 # Append include directories to CPPPATH
 env.Append(CPPPATH=include_dirs)
 
+# ------------------------------------------------------------
+# Vendor libbech32 (build from source)
+# Layout:
+#   vendor/libbech32/bech32.h
+#   vendor/libbech32/bech32.cpp
+# ------------------------------------------------------------
+BECH32_ROOT = os.path.join("vendor", "libbech32")
+env.Append(CPPPATH=[BECH32_ROOT])
+
+# ------------------------------------------------------------
+# Link vendor libsecp256k1 (static) with schnorr support
+# Folder layout expected:
+#   vendor/secp256k1/include/*.h
+#   vendor/secp256k1/lib/<platform>.<arch>.<debug|release>/{libsecp256k1.a|secp256k1.lib}
+# e.g. vendor/secp256k1/lib/linux.x86_64.release/libsecp256k1.a
+# ------------------------------------------------------------
+SECP_ROOT = os.path.join("vendor", "secp256k1")
+
+# Headers
+secp_include = os.path.join(SECP_ROOT, "include")
+env.Append(CPPPATH=[secp_include])
+
+# Map Godot target -> debug/release for your vendor folder names
+# (editor + template_debug use debug libs; template_release uses release libs)
+secp_cfg = "debug" if env.get("target") in ("editor", "template_debug") else "release"
+
+# Build the folder name like: linux.x86_64.release
+platform = env.get("platform", "")
+arch = env.get("arch", "")
+
+# Your earlier note used "macos.universal.*" etc. Keep 'universal' if set.
+parts = [platform]
+if arch:
+    parts.append(arch)
+parts.append(secp_cfg)
+secp_folder = ".".join(parts)
+
+secp_lib_dir = os.path.join(SECP_ROOT, "lib", secp_folder)
+if not os.path.isdir(secp_lib_dir):
+    print_error(f"Missing secp256k1 lib directory: {secp_lib_dir}")
+    print_error("Expected something like: vendor/secp256k1/lib/linux.x86_64.release/")
+    Exit(1)
+
+env.Append(LIBPATH=[secp_lib_dir])
+
+# Library name without prefix/suffix:
+#  - Linux/macOS: libsecp256k1.a  -> "secp256k1"
+#  - MSVC:        secp256k1.lib   -> "secp256k1"
+env.Append(LIBS=["secp256k1"])
+
 # Find all .cpp files recursively in the specified source directories
 sources = find_sources(source_dirs, source_exts)
+
+# Add vendor bech32 implementation file explicitly
+bech32_cpp = os.path.join(BECH32_ROOT, "bech32.cpp")
+if not os.path.isfile(bech32_cpp):
+    print_error(f"Missing bech32 source: {bech32_cpp}")
+    Exit(1)
+sources.append(bech32_cpp)
 
 # Handle documentation generation if applicable
 if env.get("target") in ["editor", "template_debug"]:
