@@ -6,12 +6,11 @@
 #include <godot_cpp/classes/crypto.hpp>
 
 #pragma once
-extern "C" {
-	#include <secp256k1.h>
-	#include <secp256k1_extrakeys.h>
-	#include <secp256k1_schnorrsig.h>
-	#include "bech32.h"
-}
+// extern "C" {
+// 	#include <secp256k1.h>
+// 	#include <secp256k1_extrakeys.h>
+// 	#include <secp256k1_schnorrsig.h>
+// }
 
 using namespace godot;
 
