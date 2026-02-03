@@ -89,7 +89,7 @@
     "README.md":false,
     "SConstruct":false,
     ".gitignore":true,
-    ".github":true,
+    ".github":false,
     "godot-cpp":false,
     "setup.py":false
 },
