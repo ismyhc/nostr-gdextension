@@ -104,7 +104,7 @@ env.Append(CPPPATH=[BECH32_ROOT])
 # Link vendor libsecp256k1 (static) with schnorr support
 # Folder layout expected:
 #   vendor/secp256k1/include/*.h
-#   vendor/secp256k1/lib/<platform>.<arch>.<debug|release>/{libsecp256k1.a|secp256k1.lib}
+#   vendor/secp256k1/lib/<platform>.<arch>.<debug|release>/{libsecp256k1.a|libsecp256k1.lib}
 # e.g. vendor/secp256k1/lib/linux.x86_64.release/libsecp256k1.a
 # ------------------------------------------------------------
 SECP_ROOT = os.path.join("vendor", "secp256k1")
