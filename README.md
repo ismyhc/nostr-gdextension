@@ -62,3 +62,5 @@ var kp = Nostr.keypair_from_seckey("...hexkeypair")
 print(kp["seckey"])
 print(kp["pubkey"])
 ```
+
+

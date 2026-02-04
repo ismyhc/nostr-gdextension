@@ -88,7 +88,7 @@
     "LICENSE":true,
     "README.md":false,
     "SConstruct":false,
-    ".gitignore":true,
+    ".gitignore":false,
     ".github":false,
     "godot-cpp":false,
     "setup.py":false

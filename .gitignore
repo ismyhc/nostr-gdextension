@@ -161,3 +161,10 @@ nbdist/
 *.orig
 *.old
 *.log
+
+# Keep this specific vendor library
+!vendor/secp256k1/lib/windows.x86_64.debug/libsecp256k1.lib
+# Keep this specific vendor library
+!vendor/secp256k1/lib/windows.x86_64.debug/libsecp256k1.pdb
+# Keep this specific vendor library
+!vendor/secp256k1/lib/windows.x86_64.release/libsecp256k1.lib
