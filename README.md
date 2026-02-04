@@ -1,7 +1,35 @@
 # nostr-gdextension
 
+![Alt text](logo.png)
+
+## Supported Platfroms
+
+Godot Engine 4.5 and up
+
+- ✅ macos-arm64
+- ✅ macos-x86_64
+- ✅ linux-arm64
+- ✅ linux-x86_64
+- ✅ iOS
+- ✅ android (min target sdk 35)
+- 🚧 windows-arm64
+- ✅ windows-x86_64
+- ✅ web
+
 ## How to install
 TODO:
+
+## Work in Progress
+- ✅ Generate nostr keys
+- ✅ Key from hex
+- ✅ Sign raw messages (Pass json encoded event should work)
+- 🚧 Bech32 public and private keys
+- 🚧 Bech32 encoded entities
+- 🚧 Create Filter
+- 🚧 Create Subscription
+- 🚧 POW Keys 
+- 🚧 POW Events
+- 🚧 Lots of other nice things...
 
 ## How to use
 
@@ -21,7 +49,7 @@ print(kp["pubkey"])
 ```
 ## Notes for working on developing the extension
 
-## Requirements
+#### Requirements
 - [GitHub](https://github.com/) account because we are going to be using GitHub Actions for cross platform compilation
 - [Git](https://git-scm.com/downloads) installed on your machine and configured correctly so you can push changes to remote
 - [Python](https://www.python.org/) latest version and ensure it's available in <b>system environment PATH</b>
