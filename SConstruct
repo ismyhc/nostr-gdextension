@@ -136,10 +136,23 @@ if not os.path.isdir(secp_lib_dir):
 
 env.Append(LIBPATH=[secp_lib_dir])
 
-# Library name without prefix/suffix:
-#  - Linux/macOS: libsecp256k1.a  -> "secp256k1"
-#  - MSVC:        secp256k1.lib   -> "secp256k1"
-env.Append(LIBS=["secp256k1"])
+# Prefer explicit file on Windows if the library was named with "lib" prefix.
+if env.get("platform") == "windows":
+    lib_with_libprefix = os.path.join(secp_lib_dir, "libsecp256k1.lib")
+    lib_normal = os.path.join(secp_lib_dir, "secp256k1.lib")
+
+    if os.path.isfile(lib_normal):
+        env.Append(LIBS=["secp256k1"])
+    elif os.path.isfile(lib_with_libprefix):
+        # Tell the linker to use this exact library file
+        env.Append(LINKFLAGS=[lib_with_libprefix])
+    else:
+        print_error(f"Missing secp256k1 .lib in: {secp_lib_dir}")
+        print_error("Expected secp256k1.lib or libsecp256k1.lib")
+        Exit(1)
+else:
+    # Non-Windows: normal name "secp256k1" maps to libsecp256k1.a
+    env.Append(LIBS=["secp256k1"])
 
 # Find all .cpp files recursively in the specified source directories
 sources = find_sources(source_dirs, source_exts)
