@@ -136,6 +136,11 @@ if not os.path.isdir(secp_lib_dir):
 
 env.Append(LIBPATH=[secp_lib_dir])
 
+# If consuming secp256k1 as a static library on Windows, ensure the header
+# doesn't mark symbols as dllimport (which would create __imp_* references).
+if env.get("platform") == "windows":
+    env.Append(CPPDEFINES=["SECP256K1_STATIC"])
+
 # Prefer explicit file on Windows if the library was named with "lib" prefix.
 if env.get("platform") == "windows":
     lib_with_libprefix = os.path.join(secp_lib_dir, "libsecp256k1.lib")
