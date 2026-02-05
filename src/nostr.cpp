@@ -27,10 +27,7 @@ void Nostr::request_create_new_keypair_pow(int min_leading_zero_bits) {
 
 void Nostr::_pow_task(int min_leading_zero_bits) {
 	UtilityFunctions::print("Nostr: Starting Keypair POW task");
-    //Dictionary result = create_new_keypair();//create_new_keypair_pow(min_leading_zero_bits);
-	//Dictionary result = Dictionary();
-	//result["Hello"] = "World";
-	Dictionary result = create_new_keypair();
+	Dictionary result = create_new_keypair_pow(min_leading_zero_bits);
     call_deferred("_pow_task_done", result);
 }
 
@@ -59,15 +56,17 @@ Dictionary Nostr::create_new_keypair_pow(int min_leading_zero_bits) {
 
 	secp256k1_xonly_pubkey pubkey;
 	secp256k1_keypair keypair;
-
 	secp256k1_context *ctx = get_randomized_context();
 
-	Ref<Crypto> crypto;
-	crypto.instantiate();
-
 	while (true) {
-		PackedByteArray seckey = crypto->generate_random_bytes(32);
-		int kpr = secp256k1_keypair_create(ctx, &keypair, seckey.ptr());
+		unsigned char seckey[32];
+		if (!secure_random_bytes(seckey, sizeof(seckey))) {
+			print_line("Failed to generate secure random seckey");
+			secp256k1_context_destroy(ctx);
+			return Dictionary();
+		}
+
+		int kpr = secp256k1_keypair_create(ctx, &keypair, seckey);
 		assert(kpr == 1);
 
 		int pubkey_create_r = secp256k1_keypair_xonly_pub(ctx, &pubkey, nullptr, &keypair);
@@ -79,16 +78,27 @@ Dictionary Nostr::create_new_keypair_pow(int min_leading_zero_bits) {
 
 		int leading_zero_bits = count_leading_zero_bits(serialized_pubkey, 32);
 		if (leading_zero_bits >= min_leading_zero_bits) {
-			// Write seckey
-			retval["seckey"] = PackedByteArray(seckey).hex_encode();
 
-			PackedByteArray pubkey_bytes;
-			pubkey_bytes.resize(32);
-			for (int i = 0; i < 32; ++i) {
-				pubkey_bytes.set(i, serialized_pubkey[i]);
+			// hex encode seckey
+			String seckey_hex;
+			{
+				char seckey_hex_buf[65];
+				size_t seckey_hex_len = bytes_to_hex(seckey_hex_buf, sizeof(seckey_hex_buf), seckey, 32);
+				seckey_hex = String::utf8(seckey_hex_buf, (int)seckey_hex_len);
 			}
-			// Write pubkey
-			retval["pubkey"] = pubkey_bytes.hex_encode();
+
+			retval["seckey"] = seckey_hex;
+
+			// hex encode pubkey
+			String pubkey_hex;
+			{
+				char pubkey_hex_buf[65];
+				size_t pubkey_hex_len = bytes_to_hex(pubkey_hex_buf, sizeof(pubkey_hex_buf), serialized_pubkey, 32);
+				pubkey_hex = String::utf8(pubkey_hex_buf, (int)pubkey_hex_len);
+			}
+
+			retval["pubkey"] = pubkey_hex;
+			retval["leading_zero_bits"] = leading_zero_bits;
 			break;
 		}
 	}
@@ -380,6 +390,7 @@ void Nostr::_bind_methods() {
 	ClassDB::bind_static_method("Nostr", D_METHOD("sign_event", "event", "seckey_hex"), &Nostr::sign_event);
 	ClassDB::bind_method(D_METHOD("request_create_new_keypair_pow", "min_leading_zero_bits"), &Nostr::request_create_new_keypair_pow);
 
+	// Private methods for worker thread, but not to be called directly
 	ClassDB::bind_method(D_METHOD("_pow_task", "min_leading_zero_bits"), &Nostr::_pow_task);
     ClassDB::bind_method(D_METHOD("_pow_task_done", "result"), &Nostr::_pow_task_done);
 

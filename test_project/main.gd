@@ -11,8 +11,11 @@ func test_plugin_functionality()->void:
 	#print(kp["seckey"])
 	#print(kp["pubkey"])
 
-	n.keypair_pow_done.connect(func(res): print(res))
-	n.request_create_new_keypair_pow(1)
+	#n.keypair_pow_done.connect(func(res): print(res))
+	#n.request_create_new_keypair_pow(20)
+	#n.request_create_new_keypair_pow(20)
+	
+	print("FUCK YOU")
 
 	#print("FUCK")
 	
