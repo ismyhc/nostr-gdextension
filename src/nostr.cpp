@@ -143,23 +143,22 @@ Dictionary Nostr::create_new_keypair() {
 	retval["pubkey"] = pubkey_hex;
 
 	// // Encode seckey to bech32
-	// char bech32_seckey[128];
-	// CharString seckey_hex_cs = seckey_hex.utf8();
-	// if (bech32_encode_hex("nsec", seckey_hex_cs.get_data(), bech32_seckey, sizeof(bech32_seckey))) {
-	// 	retval["bech32_seckey"] = String(bech32_seckey);
-	// } else {
-	// 	retval["bech32_seckey"] = String();
-	// }
+	char bech32_seckey[128];
+	CharString seckey_hex_cs = seckey_hex.utf8();
+	if (bech32_encode_hex("nsec", seckey_hex_cs.get_data(), bech32_seckey, sizeof(bech32_seckey))) {
+		retval["bech32_seckey"] = String(bech32_seckey);
+	} else {
+		retval["bech32_seckey"] = String();
+	}
 
 	// // Encode pubkey to bech32
-	// char bech32_pubkey[128];
-	// String pubkey_hex = pubkey_bytes.hex_encode();
-	// CharString pubkey_hex_cs = pubkey_hex.utf8();
-	// if (bech32_encode_hex("npub", pubkey_hex_cs.get_data(), bech32_pubkey, sizeof(bech32_pubkey))) {
-	// 	retval["bech32_pubkey"] = String(bech32_pubkey);
-	// } else {
-	// 	retval["bech32_pubkey"] = String();
-	// }
+	char bech32_pubkey[128];
+	CharString pubkey_hex_cs = pubkey_hex.utf8();
+	if (bech32_encode_hex("npub", pubkey_hex_cs.get_data(), bech32_pubkey, sizeof(bech32_pubkey))) {
+		retval["bech32_pubkey"] = String(bech32_pubkey);
+	} else {
+		retval["bech32_pubkey"] = String();
+	}
 
 	// Clean up
 	secp256k1_context_destroy(ctx);
