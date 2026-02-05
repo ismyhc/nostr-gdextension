@@ -8,9 +8,10 @@ extern "C" {
 	#include <secp256k1_extrakeys.h>
 	#include <secp256k1_schnorrsig.h>
 	#include <bech32.h>
-	#include <secure_random.h>
-	#include <hex_utils.h>
 }
+
+#include <secure_random.h>
+#include <hex_utils.h>
 
 using namespace godot;
 
