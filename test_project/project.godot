@@ -27,7 +27,3 @@ project/assembly_name="Test_Project"
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
-
-[threading]
-
-worker_pool/max_threads=2

@@ -6,6 +6,7 @@
 #include "godot_cpp/variant/packed_byte_array.hpp"
 #include "godot_cpp/variant/string.hpp"
 #include <godot_cpp/classes/json.hpp>
+#include <godot_cpp/classes/os.hpp>
 #include <cassert>
 #include <cstring>
 
@@ -18,17 +19,34 @@
 using namespace godot;
 
 void Nostr::request_create_new_keypair_pow(int min_leading_zero_bits) {
-	UtilityFunctions::print("Nostr: Requesting Keypair POW task");
-    WorkerThreadPool::get_singleton()->add_task(
-        Callable(this, "_pow_task").bind(min_leading_zero_bits),
-        true
-    );
+	if (_pow_working.load(std::memory_order_relaxed)) {
+		UtilityFunctions::print("Nostr: POW already in progress, ignoring new request");
+		return;
+	}
+	int cores = OS::get_singleton()->get_processor_count();
+	int workers = cores - 1;
+	if (workers < 1) workers = 1;
+	UtilityFunctions::print("Starting ", workers, " worker threads for POW");
+
+	_pow_found.store(false, std::memory_order_relaxed);
+	_pow_working.store(true,  std::memory_order_relaxed);
+	for (int i = 0; i < workers; ++i) {
+		WorkerThreadPool::get_singleton()->add_task(
+			Callable(this, "_pow_task").bind(min_leading_zero_bits),
+			true
+		);
+	}
 }
 
 void Nostr::_pow_task(int min_leading_zero_bits) {
 	UtilityFunctions::print("Nostr: Starting Keypair POW task");
+	if (_pow_found.load(std::memory_order_relaxed)) return;
 	Dictionary result = create_new_keypair_pow(min_leading_zero_bits);
-    call_deferred("_pow_task_done", result);
+	bool expected = false;
+	if (_pow_found.compare_exchange_strong(expected, true, std::memory_order_relaxed)) {
+		_pow_working.store(false, std::memory_order_relaxed);
+    	call_deferred("_pow_task_done", result);
+	}
 }
 
 void Nostr::_pow_task_done(const Dictionary& result) {
@@ -59,6 +77,11 @@ Dictionary Nostr::create_new_keypair_pow(int min_leading_zero_bits) {
 	secp256k1_context *ctx = get_randomized_context();
 
 	while (true) {
+		// check if another thread found a result
+		if (_pow_found.load(std::memory_order_relaxed)) {
+			return Dictionary();
+		}
+
 		unsigned char seckey[32];
 		if (!secure_random_bytes(seckey, sizeof(seckey))) {
 			print_line("Failed to generate secure random seckey");
