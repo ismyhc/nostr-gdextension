@@ -92,13 +92,26 @@ bundle_id_prefix = env.get('bundle_id_prefix', 'com.gdextension')  # Ensure pref
 env.Append(CPPPATH=include_dirs)
 
 # ------------------------------------------------------------
-# Vendor libbech32 (build from source)
+# Vendor bech32 (header-only)
 # Layout:
-#   vendor/libbech32/bech32.h
-#   vendor/libbech32/bech32.cpp
+#   vendor/bech32/bech32.h
 # ------------------------------------------------------------
-BECH32_ROOT = os.path.join("vendor", "libbech32")
+BECH32_ROOT = os.path.join("vendor", "bech32")
 env.Append(CPPPATH=[BECH32_ROOT])
+
+# ------------------------------------------------------------
+# Vendor util (header-only)
+# Layout:
+#   vendor/util/secure_random.h
+#   vendor/util/hex_utils.h
+# ------------------------------------------------------------
+UTIL_ROOT = os.path.join("vendor", "util")
+env.Append(CPPPATH=[UTIL_ROOT])
+
+# Find all .cpp files recursively in the specified source directories
+sources = find_sources(source_dirs, source_exts)
+
+# (No bech32 source to add; header-only)
 
 # ------------------------------------------------------------
 # Link vendor libsecp256k1 (static) with schnorr support
@@ -163,11 +176,11 @@ else:
 sources = find_sources(source_dirs, source_exts)
 
 # Add vendor bech32 implementation file explicitly
-bech32_cpp = os.path.join(BECH32_ROOT, "bech32.cpp")
-if not os.path.isfile(bech32_cpp):
-    print_error(f"Missing bech32 source: {bech32_cpp}")
-    Exit(1)
-sources.append(bech32_cpp)
+# bech32_cpp = os.path.join(BECH32_ROOT, "bech32.cpp")
+# if not os.path.isfile(bech32_cpp):
+#     print_error(f"Missing bech32 source: {bech32_cpp}")
+#     Exit(1)
+# sources.append(bech32_cpp)
 
 # Handle documentation generation if applicable
 if env.get("target") in ["editor", "template_debug"]:

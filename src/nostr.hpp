@@ -7,6 +7,9 @@ extern "C" {
 	#include <secp256k1.h>
 	#include <secp256k1_extrakeys.h>
 	#include <secp256k1_schnorrsig.h>
+	#include <bech32.h>
+	#include <secure_random.h>
+	#include <hex_utils.h>
 }
 
 using namespace godot;
@@ -19,7 +22,21 @@ protected:
 	static secp256k1_context* get_randomized_context();
 
 private:
+	void request_create_new_keypair_pow(int min_leading_zero_bits);
+
+	void _pow_task(int min_leading_zero_bits);
+	void _pow_task_done(const Dictionary& result);
+
+	static int count_leading_zero_bits(const uint8_t* data, size_t data_len);
+	static Dictionary create_new_keypair_pow(int min_leading_zero_bits);
 	static Dictionary create_new_keypair();
 	static Dictionary keypair_from_seckey(const String& seckey_hex);
 	static String sign(const String& msg, const String& seckey_hex);
+	static Dictionary sign_event(const Dictionary& event, const String& seckey_hex);
+	static String get_id_for_event(const String& event);
+	static String get_event_string(const Dictionary& event);
+	static String hex_to_nsec(const String& seckey_hex);
+	static String nsec_to_hex(const String& bech32_seckey);
+	static String hex_to_npub(const String& pubkey_hex);
+	static String npub_to_hex(const String& bech32_pubkey);
 };
