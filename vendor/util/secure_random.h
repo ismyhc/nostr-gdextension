@@ -37,12 +37,34 @@ static inline int secure_random_bytes(void *out, size_t out_len);
 #endif
 
 #if defined(__EMSCRIPTEN__)
+  #include <errno.h>
+  #include <fcntl.h>
+  #include <unistd.h>
 
-  #include <emscripten/emscripten.h>
+  static int secure_random_read_all(int fd, void *out, size_t out_len) {
+    uint8_t *p = (uint8_t *)out;
+    while (out_len) {
+      ssize_t r = read(fd, p, out_len);
+      if (r < 0) {
+        if (errno == EINTR) continue;
+        return 0;
+      }
+      if (r == 0) return 0;
+      p += (size_t)r;
+      out_len -= (size_t)r;
+    }
+    return 1;
+  }
 
-  static inline int secure_random_bytes(void *out, size_t out_len) {
+  int secure_random_bytes(void *out, size_t out_len) {
     if (!out && out_len) return 0;
-    return emscripten_get_random_bytes(out, out_len) == 0;
+    if (out_len == 0) return 1;
+
+    int fd = open("/dev/urandom", O_RDONLY);
+    if (fd < 0) return 0;
+    int ok = secure_random_read_all(fd, out, out_len);
+    close(fd);
+    return ok;
   }
 
 #elif defined(_WIN32)
