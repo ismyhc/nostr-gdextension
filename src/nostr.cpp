@@ -18,6 +18,7 @@
 using namespace godot;
 
 void Nostr::request_create_new_keypair_pow(int min_leading_zero_bits) {
+	UtilityFunctions::print("Nostr: Requesting Keypair POW task");
     WorkerThreadPool::get_singleton()->add_task(
         Callable(this, "_pow_task").bind(min_leading_zero_bits),
         true
@@ -27,8 +28,9 @@ void Nostr::request_create_new_keypair_pow(int min_leading_zero_bits) {
 void Nostr::_pow_task(int min_leading_zero_bits) {
 	UtilityFunctions::print("Nostr: Starting Keypair POW task");
     //Dictionary result = create_new_keypair();//create_new_keypair_pow(min_leading_zero_bits);
-	Dictionary result = Dictionary();
-	result["Hello"] = "World";
+	//Dictionary result = Dictionary();
+	//result["Hello"] = "World";
+	Dictionary result = create_new_keypair();
     call_deferred("_pow_task_done", result);
 }
 

@@ -1,16 +1,19 @@
 extends Node2D
 
+@onready var n := Nostr.new()
+
 func _ready() -> void:
 	test_plugin_functionality()
 
 func test_plugin_functionality()->void:
 	
-	var kp = Nostr.create_new_keypair()
-	print(kp["seckey"])
-	print(kp["pubkey"])
-	#var n = Nostr.new()
-	#n.keypair_pow_done.connect(func(res): print(res))
-	#n.request_create_new_keypair_pow(1)
+	#var kp = Nostr.create_new_keypair()
+	#print(kp["seckey"])
+	#print(kp["pubkey"])
+
+	n.keypair_pow_done.connect(func(res): print(res))
+	n.request_create_new_keypair_pow(1)
+
 	#print("FUCK")
 	
 	#var kp: Dictionary = Nostr.create_new_keypair()
