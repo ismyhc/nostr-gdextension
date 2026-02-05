@@ -1,29 +1,8 @@
-/* secure_random.h
-   Cross-platform cryptographically secure random bytes (C, single-header).
-
-   Supports:
-     - Emscripten (Web): emscripten_get_random_bytes()
-     - Windows:         BCryptGenRandom()
-     - Apple/BSD:       arc4random_buf()
-     - Linux/Android:   getrandom() syscall with /dev/urandom fallback
-     - Other Unix:      /dev/urandom fallback
-
-   Usage:
-     #include "secure_random.h"
-
-     uint8_t sk[32];
-     if (!secure_random_bytes(sk, sizeof(sk))) { ... }
-
-   License: Public domain / CC0-ish.
-*/
-/* secure_random.h
-   Cross-platform cryptographically secure random bytes (C, single-header).
-   ...
-*/
 #ifndef SECURE_RANDOM_H
 #define SECURE_RANDOM_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,12 +15,13 @@ static inline int secure_random_bytes(void *out, size_t out_len);
 } /* extern "C" */
 #endif
 
+/* ======================== IMPLEMENTATION ======================== */
 #if defined(__EMSCRIPTEN__)
   #include <errno.h>
   #include <fcntl.h>
   #include <unistd.h>
 
-  static int secure_random_read_all(int fd, void *out, size_t out_len) {
+  static inline int secure_random_read_all(int fd, void *out, size_t out_len) {
     uint8_t *p = (uint8_t *)out;
     while (out_len) {
       ssize_t r = read(fd, p, out_len);
@@ -56,7 +36,7 @@ static inline int secure_random_bytes(void *out, size_t out_len);
     return 1;
   }
 
-  int secure_random_bytes(void *out, size_t out_len) {
+  static inline int secure_random_bytes(void *out, size_t out_len) {
     if (!out && out_len) return 0;
     if (out_len == 0) return 1;
 
@@ -77,14 +57,14 @@ static inline int secure_random_bytes(void *out, size_t out_len);
 
   static inline int secure_random_bytes(void *out, size_t out_len) {
     if (!out && out_len) return 0;
-    if (out_len > 0xFFFFFFFFu) return 0;
+    if (out_len > 0xFFFFFFFFu) return 0; /* BCrypt takes ULONG */
     NTSTATUS st = BCryptGenRandom(
       NULL,
       (PUCHAR)out,
       (ULONG)out_len,
       BCRYPT_USE_SYSTEM_PREFERRED_RNG
     );
-    return st == 0;
+    return st == 0; /* STATUS_SUCCESS */
   }
 
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__)
@@ -156,4 +136,5 @@ static inline int secure_random_bytes(void *out, size_t out_len);
   }
 
 #endif /* platform selection */
+
 #endif /* SECURE_RANDOM_H */
