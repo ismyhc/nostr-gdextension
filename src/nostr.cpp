@@ -1,4 +1,5 @@
 #include "nostr.hpp"
+#include "godot_cpp/classes/rendering_device.hpp"
 #include "godot_cpp/core/class_db.hpp"
 #include "godot_cpp/core/object.hpp"
 #include "godot_cpp/variant/array.hpp"
@@ -102,6 +103,8 @@ Dictionary Nostr::create_new_keypair_pow(int min_leading_zero_bits) {
 		int leading_zero_bits = count_leading_zero_bits(serialized_pubkey, 32);
 		if (leading_zero_bits >= min_leading_zero_bits) {
 
+			Dictionary keypair;
+
 			// hex encode seckey
 			String seckey_hex;
 			{
@@ -110,7 +113,7 @@ Dictionary Nostr::create_new_keypair_pow(int min_leading_zero_bits) {
 				seckey_hex = String::utf8(seckey_hex_buf, (int)seckey_hex_len);
 			}
 
-			retval["seckey"] = seckey_hex;
+			keypair["seckey"] = seckey_hex;
 
 			// hex encode pubkey
 			String pubkey_hex;
@@ -120,8 +123,29 @@ Dictionary Nostr::create_new_keypair_pow(int min_leading_zero_bits) {
 				pubkey_hex = String::utf8(pubkey_hex_buf, (int)pubkey_hex_len);
 			}
 
-			retval["pubkey"] = pubkey_hex;
+			keypair["pubkey"] = pubkey_hex;
+
+			// // Encode seckey to bech32
+			char bech32_seckey[128];
+			CharString seckey_hex_cs = seckey_hex.utf8();
+			if (bech32_encode_hex("nsec", seckey_hex_cs.get_data(), bech32_seckey, sizeof(bech32_seckey))) {
+				keypair["nsec"] = String(bech32_seckey);
+			} else {
+				keypair["nsec"] = String();
+			}
+
+			// // Encode pubkey to bech32
+			char bech32_pubkey[128];
+			CharString pubkey_hex_cs = pubkey_hex.utf8();
+			if (bech32_encode_hex("npub", pubkey_hex_cs.get_data(), bech32_pubkey, sizeof(bech32_pubkey))) {
+				keypair["npub"] = String(bech32_pubkey);
+			} else {
+				keypair["npub"] = String();
+			}
+
+			retval["keypair"] = keypair;
 			retval["leading_zero_bits"] = leading_zero_bits;
+
 			break;
 		}
 	}
@@ -181,18 +205,18 @@ Dictionary Nostr::create_new_keypair() {
 	char bech32_seckey[128];
 	CharString seckey_hex_cs = seckey_hex.utf8();
 	if (bech32_encode_hex("nsec", seckey_hex_cs.get_data(), bech32_seckey, sizeof(bech32_seckey))) {
-		retval["bech32_seckey"] = String(bech32_seckey);
+		retval["nsec"] = String(bech32_seckey);
 	} else {
-		retval["bech32_seckey"] = String();
+		retval["nsec"] = String();
 	}
 
 	// // Encode pubkey to bech32
 	char bech32_pubkey[128];
 	CharString pubkey_hex_cs = pubkey_hex.utf8();
 	if (bech32_encode_hex("npub", pubkey_hex_cs.get_data(), bech32_pubkey, sizeof(bech32_pubkey))) {
-		retval["bech32_pubkey"] = String(bech32_pubkey);
+		retval["npub"] = String(bech32_pubkey);
 	} else {
-		retval["bech32_pubkey"] = String();
+		retval["npub"] = String();
 	}
 
 	// Clean up

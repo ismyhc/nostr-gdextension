@@ -8,6 +8,10 @@
 script = ExtResource("1_ig7tw")
 
 [node name="Icon" type="Sprite2D" parent="." unique_id=1555620363]
-position = Vector2(505, 334)
+position = Vector2(532, 423)
 texture = ExtResource("2_h2yge")
 script = ExtResource("3_1bvp3")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="." unique_id=1018891212]
+offset_right = 848.0
+offset_bottom = 287.0
