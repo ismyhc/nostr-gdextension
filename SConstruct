@@ -104,6 +104,7 @@ env.Append(CPPPATH=[BECH32_ROOT])
 # Layout:
 #   vendor/util/secure_random.h
 #   vendor/util/hex_utils.h
+#   vendor/util/sha256.h
 # ------------------------------------------------------------
 UTIL_ROOT = os.path.join("vendor", "util")
 env.Append(CPPPATH=[UTIL_ROOT])

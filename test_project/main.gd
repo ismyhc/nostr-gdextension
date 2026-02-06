@@ -15,27 +15,27 @@ func test_plugin_functionality()->void:
 		$RichTextLabel.text = JSON.stringify(res)
 	)
 	n.request_create_new_keypair_pow(16)
-	n.request_create_new_keypair_pow(20)
+	#n.request_create_new_keypair_pow(20)
 	
 	print("FUCK YOU")
 
 	#print("FUCK")
 	
-	#var kp: Dictionary = Nostr.create_new_keypair()
+	var kp: Dictionary = Nostr.create_new_keypair()
+	
+	var event = {
+		"pubkey": kp["pubkey"],
+		"created_at": int(Time.get_unix_time_from_system()),
+		"kind": 1,
+		"tags": [
+			["p", kp["pubkey"]]
+		],
+		"content": "Hello from Godot"
+	}
+	
+	var signed_event = Nostr.sign_event(event, kp["seckey"])
 	#
-	#var event = {
-		#"pubkey": kp["pubkey"],
-		#"created_at": int(Time.get_unix_time_from_system()),
-		#"kind": 1,
-		#"tags": [
-			##"p", kp["pubkey"]
-		#],
-		#"content": "Hello from Godot"
-	#}
-	#
-	#var signed_event = Nostr.sign_event(event, kp["seckey"])
-	#
-	#print(signed_event)
+	print(signed_event)
 
 	#print("Hex Private Key: " + kd["seckey"])
 	#print("Hex Public Key: " + kd["pubkey"])
