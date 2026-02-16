@@ -43,6 +43,9 @@ void Nostr::_pow_task_sign_event(const Dictionary& event, int min_leading_zero_b
 	UtilityFunctions::print("Nostr: Starting Event POW task");
 	if (_pow_event_found.load(std::memory_order_relaxed)) return;
 
+	// Copy the event to modify it
+	Dictionary event_copy = event;
+
 	// Here we add nonce to the event tags, we need to append a tag like ["nonce", <random 32 byte hex string>, <leading zero bits>]
 	// Nonce array
 	Array nonce_tag;
@@ -57,17 +60,17 @@ void Nostr::_pow_task_sign_event(const Dictionary& event, int min_leading_zero_b
 	nonce_tag.append(String::utf8(nonce_hex, (int)nonce_hex_len));
 	nonce_tag.append(min_leading_zero_bits);
 
-	Array tags = event["tags"];
+	Array tags = event_copy["tags"];
 	tags.append(nonce_tag);
-	//event["tags"] = tags; TODO:
+	event_copy["tags"] = tags;
 
-	String event_string = get_event_string(event);
+	String event_string = get_event_string(event_copy);
 	String event_id = get_id_for_event(event_string);
 
 
 
 
-	Dictionary result = sign_event(event, seckey_hex);
+	Dictionary result = sign_event(event_copy, seckey_hex);
 	bool expected = false;
 	if (_pow_event_found.compare_exchange_strong(expected, true, std::memory_order_relaxed)) {
 		_pow_event_working.store(false, std::memory_order_relaxed);
@@ -87,8 +90,6 @@ void Nostr::_pow_task_sign_event_done(const Dictionary& result) {
 
 // 	}
 // }
-
-
 
 void Nostr::request_create_new_keypair_pow(int min_leading_zero_bits) {
 	if (_pow_keypair_working.load(std::memory_order_relaxed)) {
