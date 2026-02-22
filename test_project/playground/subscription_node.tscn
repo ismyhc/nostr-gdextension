@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://gom6ry76140o"]
+
+[ext_resource type="Script" uid="uid://b74h5l1pdbyfe" path="res://playground/subscription_node.gd" id="1_4xkjp"]
+
+[node name="SubscriptionNode" type="GraphNode" unique_id=384211979]
+offset_left = 48.0
+offset_top = 55.0
+offset_right = 390.0
+offset_bottom = 296.0
+mouse_filter = 1
+title = "Subscription"
+slot/0/left_enabled = false
+slot/0/left_type = 1
+slot/0/left_color = Color(1, 1, 1, 1)
+slot/0/left_icon = null
+slot/0/right_enabled = true
+slot/0/right_type = 1
+slot/0/right_color = Color(1, 0.21176471, 1, 1)
+slot/0/right_icon = null
+slot/0/draw_stylebox = true
+script = ExtResource("1_4xkjp")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=611331531]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="IdsLineEdit" type="LineEdit" parent="VBoxContainer" unique_id=894669573]
+layout_mode = 2
+placeholder_text = "Event Ids: <event_id>,<event_id>..."
+
+[node name="AuthorsLineEdit" type="LineEdit" parent="VBoxContainer" unique_id=1488072888]
+layout_mode = 2
+placeholder_text = "Authors: <pubkey>,<pubkey>..."
+
+[node name="KindsLineEdit" type="LineEdit" parent="VBoxContainer" unique_id=1315925863]
+layout_mode = 2
+placeholder_text = "Kinds: <kind>,<kind>..."
+
+[node name="LimitLineEdit" type="LineEdit" parent="VBoxContainer" unique_id=1411590190]
+layout_mode = 2
+placeholder_text = "Limit: 50"
+
+[node name="EnableButton" type="CheckButton" parent="VBoxContainer" unique_id=780902191]
+layout_mode = 2
+
+[connection signal="slot_updated" from="." to="." method="_on_slot_updated"]
+[connection signal="toggled" from="VBoxContainer/EnableButton" to="." method="_on_enable_button_toggled"]

@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://nugm7k7cw3cf"]
+
+[ext_resource type="Script" uid="uid://cf8xcm5iusic" path="res://examples/bitchat/bitchat.gd" id="1_5npgh"]
+
+[node name="Bitchat" type="Control" unique_id=840009261]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5npgh")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="." unique_id=1993693632]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="SidebarContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=1369004877]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MessageContainer" type="VBoxContainer" parent="HBoxContainer" unique_id=168945937]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+
+[node name="MessagesScrollContainer" type="ScrollContainer" parent="HBoxContainer/MessageContainer" unique_id=283119950]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/MessageContainer/MessagesScrollContainer" unique_id=1430093622]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
